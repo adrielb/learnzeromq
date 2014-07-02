@@ -1,4 +1,9 @@
-all: rep-req
+all: push-pull
+
+push-pull:
+	python PUSH-PULL/simulation.py &
+	python PUSH-PULL/simulation.py &
+	python PUSH-PULL/optimizer.py
 
 rep-req:
 	python REP-REQ/simulation.py &
