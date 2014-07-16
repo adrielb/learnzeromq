@@ -12,11 +12,19 @@ print "Simulation connecting to " + push_addr
 push_socket = context.socket(zmq.PUSH)
 push_socket.connect(push_addr)
 
+# Set up a poller to multiplex the work receiver and control receiver channels
+poller = zmq.Poller()
+poller.register(pull_socket, zmq.POLLIN)
+
 results = {}
 while True:
-    params = pull_socket.recv_json()
-    print "Recieved params: " + str(params)
+    socks = dict(poller.poll())
 
-    results['L'] = params['a'] * params['a']
+    if socks.get( pull_socket ) == zmq.POLLIN:
+        params = pull_socket.recv_json()
+        print "Recieved params: " + str(params)
 
-    push_socket.send_json( results )
+        results['L'] = params['a'] * params['a']
+
+        push_socket.send_json( results )
+
